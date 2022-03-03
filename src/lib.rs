@@ -1,3 +1,5 @@
+#![allow(clippy::unused_unit)]
+
 extern crate log;
 
 mod utils;
