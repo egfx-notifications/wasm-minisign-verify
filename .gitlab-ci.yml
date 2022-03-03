@@ -40,6 +40,7 @@ Test Rust Code:
         - !reference [.setup rust, before_script]
     script:
         - cargo test --verbose
+    needs: ["Build Rust Code"]
 
 Lint Rust Code with Clippy:
     stage: Lint Rust
@@ -48,6 +49,7 @@ Lint Rust Code with Clippy:
     script:
         - rustup component add clippy
         - cargo clippy -- -D warnings
+    needs: ["Build Rust Code"]
 
 Check Rust code formatting:
     stage: Lint Rust
@@ -56,6 +58,7 @@ Check Rust code formatting:
     script:
         - rustup component add rustfmt
         - cargo fmt -- --check
+    needs: ["Build Rust Code"]
 
 Audit Rust dependencies:
     stage: Audit Rust
