@@ -29,52 +29,52 @@ stages:  # stages are executed in the order they are defined; if no direct depen
         - cargo --version
 
 Build Rust Code:
-  stage: Build Rust
-  before_script:
+    stage: Build Rust
+    before_script:
         - !reference [.setup rust, before_script]
-  script:
-    - cargo build --verbose
-  tags:
-    - egfx
+    script:
+        - cargo build --verbose
+    tags:
+        - egfx
 
 Test Rust Code:
-  stage: Test Rust
-  before_script:
+    stage: Test Rust
+    before_script:
         - !reference [.setup rust, before_script]
-  script:
-    - cargo test --verbose
-  tags:
-    - egfx
+    script:
+        - cargo test --verbose
+    tags:
+        - egfx
 
 Lint Rust Code with Clippy:
-  stage: Lint Rust
-  before_script:
+    stage: Lint Rust
+    before_script:
         - !reference [.setup rust, before_script]
-  script:
-    - rustup component add clippy
-    - cargo clippy -- -D warnings
-  tags:
-    - egfx
+    script:
+        - rustup component add clippy
+        - cargo clippy -- -D warnings
+    tags:
+        - egfx
 
 Check Rust code formatting:
-  stage: Lint Rust
-  before_script:
+    stage: Lint Rust
+    before_script:
         - !reference [.setup rust, before_script]
-  script:
-    - rustup component add rustfmt
-    - cargo fmt -- --check
-  tags:
-    - egfx
+    script:
+        - rustup component add rustfmt
+        - cargo fmt -- --check
+    tags:
+        - egfx
 
 Audit Rust dependencies:
-  stage: Audit Rust
-  before_script:
+    stage: Audit Rust
+    before_script:
         - !reference [.setup rust, before_script]
-  script:
-    - cargo install cargo-audit
-    - cargo audit
-  tags:
-    - egfx
+    script:
+        - cargo install cargo-audit
+        - cargo audit
+    tags:
+        - egfx
 
 Lint CI:
     image: artifacts.core.pke.fhm.de/peo-docker-public-local/python:3
