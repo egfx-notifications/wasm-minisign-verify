@@ -64,6 +64,7 @@ Audit Rust dependencies:
     script:
         - cargo install cargo-audit
         - cargo audit
+    needs: []
 
 Lint CI:
     image: artifacts.core.pke.fhm.de/peo-docker-public-local/python:3
@@ -72,6 +73,7 @@ Lint CI:
         - pip install yamllint
     script:
         - "yamllint .gitlab-ci.yml"
+    needs: []
     rules:
         - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || $CI_PIPELINE_SOURCE == "push"'
           changes:  # run if any of the following changes on a MR or push
