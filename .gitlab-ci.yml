@@ -24,6 +24,7 @@ stages:  # stages are executed in the order they are defined; if no direct depen
 
 .setup rust:
     before_script:
+        - apk add --no-cache build-base
         - rustc --version
         - cargo --version
 
