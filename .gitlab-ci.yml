@@ -99,5 +99,5 @@ Lint CI:
         - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || $CI_PIPELINE_SOURCE == "push"'
           changes:  # run if any of the following changes on a MR or push
               - '.gitlab-ci.yml'
-        - if: '$CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "push"'
+        - if: '$CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "push" && $CI_PIPELINE_SOURCE != "schedule"'
           when: on_success  # always run for other pipeline sources
