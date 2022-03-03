@@ -2,13 +2,20 @@
 variables:  # global variables applying to all jobs unless explicitly overwritten
     REQUESTS_CA_BUNDLE: /etc/ssl/certs/ca-certificates.crt  # this tells python to actually use the installed system certificates
 
-workflow:
-    rules:  # define default rules for the whole pipeline
+.default run rules:
+    rules:  # determine if job should run or not; evaluation stops at the first matching rule!
         - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'  # in general, do run on a MR
         - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'  # do not run for a branch if there is also a MR for that branch - this prevents running two pipelines for the same commit
           when: never
+        - if: '$CI_PIPELINE_SOURCE == "schedule"'  # do not run on schedule, we want to do this explicitly on the job
+          when: never
         - if: '$CI_COMMIT_BRANCH == "main"'  # if we get here the trigger was not a MR, in that case we only want to run for commits on branch main right now
         - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+(?:-\w+)*$/'  # also run for version tags
+
+workflow:
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "schedule"'  # run on schedule
+        - !reference [.default run rules, rules]
 
 default:  # default settings applying to all jobs unless explicitly overwritten
     image: rust:latest
@@ -33,6 +40,8 @@ Build Rust Code:
         - !reference [.setup rust, before_script]
     script:
         - cargo build --verbose
+    rules:
+        - !reference [.default run rules, rules]
 
 Test Rust Code:
     stage: Test Rust
@@ -41,6 +50,8 @@ Test Rust Code:
     script:
         - cargo test --verbose
     needs: ["Build Rust Code"]
+    rules:
+        - !reference [.default run rules, rules]
 
 Lint Rust Code with Clippy:
     stage: Lint Rust
@@ -50,6 +61,8 @@ Lint Rust Code with Clippy:
         - rustup component add clippy
         - cargo clippy -- -D warnings
     needs: ["Build Rust Code"]
+    rules:
+        - !reference [.default run rules, rules]
 
 Check Rust code formatting:
     stage: Lint Rust
@@ -59,6 +72,8 @@ Check Rust code formatting:
         - rustup component add rustfmt
         - cargo fmt -- --check
     needs: ["Build Rust Code"]
+    rules:
+        - !reference [.default run rules, rules]
 
 Audit Rust dependencies:
     stage: Audit Rust
@@ -68,6 +83,9 @@ Audit Rust dependencies:
         - cargo install cargo-audit
         - cargo audit
     needs: []
+    rules:  # determine if job should run or not; evaluation stops at the first matching rule!
+        - if: '$CI_PIPELINE_SOURCE == "schedule"'  # run on schedule
+        - !reference [.default run rules, rules]
 
 Lint CI:
     image: artifacts.core.pke.fhm.de/peo-docker-public-local/python:3
