@@ -1,0 +1,89 @@
+---
+variables:  # global variables applying to all jobs unless explicitly overwritten
+    REQUESTS_CA_BUNDLE: /etc/ssl/certs/ca-certificates.crt  # this tells python to actually use the installed system certificates
+
+workflow:
+    rules:  # define default rules for the whole pipeline
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'  # in general, do run on a MR
+        - if: '$CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS'  # do not run for a branch if there is also a MR for that branch - this prevents running two pipelines for the same commit
+          when: never
+        - if: '$CI_COMMIT_BRANCH == "main"'  # if we get here the trigger was not a MR, in that case we only want to run for commits on branch main right now
+        - if: '$CI_COMMIT_TAG =~ /^\d+\.\d+\.\d+(?:-\w+)*$/'  # also run for version tags
+
+default:  # default settings applying to all jobs unless explicitly overwritten
+    image: artifacts.core.pke.fhm.de/peo-docker-public-local/rust:1.58  # rust image with P7S1 SSL certificates preinstalled
+    tags:
+        - egfx  # this tag will be used to automatically select the Gitlab runner configured for our group
+
+stages:  # stages are executed in the order they are defined; if no direct dependencies between jobs are defined, all jobs of a stage need to finish successfully before the next stage begins
+    - Build Rust
+    - Test Rust
+    - Lint Rust
+    - Lint
+    - Audit Rust
+
+.setup rust:
+    before_script:
+        - rustc --version
+        - cargo --version
+
+Build Rust Code:
+  stage: Build Rust
+  before_script:
+        - !reference [.setup rust, before_script]
+  script:
+    - cargo build --verbose
+  tags:
+    - egfx
+
+Test Rust Code:
+  stage: Test Rust
+  before_script:
+        - !reference [.setup rust, before_script]
+  script:
+    - cargo test --verbose
+  tags:
+    - egfx
+
+Lint Rust Code with Clippy:
+  stage: Lint Rust
+  before_script:
+        - !reference [.setup rust, before_script]
+  script:
+    - rustup component add clippy
+    - cargo clippy -- -D warnings
+  tags:
+    - egfx
+
+Check Rust code formatting:
+  stage: Lint Rust
+  before_script:
+        - !reference [.setup rust, before_script]
+  script:
+    - rustup component add rustfmt
+    - cargo fmt -- --check
+  tags:
+    - egfx
+
+Audit Rust dependencies:
+  stage: Audit Rust
+  before_script:
+        - !reference [.setup rust, before_script]
+  script:
+    - cargo install cargo-audit
+    - cargo audit
+  tags:
+    - egfx
+
+Lint CI:
+    stage: Lint
+    before_script:
+        - pip install yamllint
+    script:
+        - "yamllint .gitlab-ci.yml"
+    rules:
+        - if: '$CI_PIPELINE_SOURCE == "merge_request_event" || $CI_PIPELINE_SOURCE == "push"'
+          changes:  # run if any of the following changes on a MR or push
+              - '.gitlab-ci.yml'
+        - if: '$CI_PIPELINE_SOURCE != "merge_request_event" && $CI_PIPELINE_SOURCE != "push"'
+          when: on_success  # always run for other pipeline sources
