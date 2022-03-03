@@ -1,5 +1,6 @@
 # WASM Minisign Verify
 
+[![pipeline status](https://gitlab.pke.fhm.de/echtzeitgrafik/wasm-minisign-verify/badges/main/pipeline.svg)](https://gitlab.pke.fhm.de/echtzeitgrafik/wasm-minisign-verify/-/commits/main)
 [![License][license-badge]][license]
 
 This is the
