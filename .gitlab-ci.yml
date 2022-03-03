@@ -33,8 +33,6 @@ Build Rust Code:
         - !reference [.setup rust, before_script]
     script:
         - cargo build --verbose
-    tags:
-        - egfx
 
 Test Rust Code:
     stage: Test Rust
@@ -42,8 +40,6 @@ Test Rust Code:
         - !reference [.setup rust, before_script]
     script:
         - cargo test --verbose
-    tags:
-        - egfx
 
 Lint Rust Code with Clippy:
     stage: Lint Rust
@@ -52,8 +48,6 @@ Lint Rust Code with Clippy:
     script:
         - rustup component add clippy
         - cargo clippy -- -D warnings
-    tags:
-        - egfx
 
 Check Rust code formatting:
     stage: Lint Rust
@@ -62,8 +56,6 @@ Check Rust code formatting:
     script:
         - rustup component add rustfmt
         - cargo fmt -- --check
-    tags:
-        - egfx
 
 Audit Rust dependencies:
     stage: Audit Rust
@@ -72,8 +64,6 @@ Audit Rust dependencies:
     script:
         - cargo install cargo-audit
         - cargo audit
-    tags:
-        - egfx
 
 Lint CI:
     image: artifacts.core.pke.fhm.de/peo-docker-public-local/python:3
