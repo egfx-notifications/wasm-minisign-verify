@@ -1,17 +1,16 @@
-# wasm-minisign-verify
+# WASM Minisign Verify
 
-[![GitHub CI][github-actions-badge]][github-actions]
 [![License][license-badge]][license]
 
 This is the
 [rust-minisign-verify](https://github.com/jedisct1/rust-minisign-verify)
 library compiled to WebAssembly.
-
+This is an internal fork of https://github.com/threema-ch/wasm-minisign-verify containing the Gitlab CI workflows to publish to our deno modules repository. Right now it also contains some commits which we submitted as Pull Requests, but are not merged yet upstream.
 
 ## Loading the Library
 
 Note: A dependency graph that contains any WASM must all be imported
-asynchronously.  This can be done using a bundler with an appropriate WASM
+asynchronously. This can be done using a bundler with an appropriate WASM
 loader, or through
 [dynamic imports](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import#Dynamic_Imports).
 
@@ -21,13 +20,14 @@ The simplest way is to use a bootstrapping js as the entry point to your entire 
 
 ```js
 // bootstrap.js
-import('./index.js')
-  .catch(e => console.error('Error importing `index.js`:', e));
+import("./index.js").catch((e) =>
+  console.error("Error importing `index.js`:", e)
+);
 ```
 
 ```js
 // index.js
-import * as minisignVerify from '@threema/wasm-minisign-verify';
+import * as minisignVerify from "@threema/wasm-minisign-verify";
 ```
 
 ### Dynamic Import (Promise)
@@ -35,18 +35,16 @@ import * as minisignVerify from '@threema/wasm-minisign-verify';
 Alternatively, import the library asynchronously:
 
 ```js
-import('@threema/wasm-minisign-verify')
-    .then((minisignVerify) => {
-        // Use the library
-    });
+import("@threema/wasm-minisign-verify").then((minisignVerify) => {
+  // Use the library
+});
 ```
 
 If you're in an asynchronous context, you can also use the `await` keyword.
 
 ```js
-const minisignVerify = await import('@threema/wasm-minisign-verify');
+const minisignVerify = await import("@threema/wasm-minisign-verify");
 ```
-
 
 ## Usage
 
@@ -66,7 +64,7 @@ Create a Minisign public key from a string, as in the `minisign.pub` file:
 
 ```js
 const publicKey = minisignVerify.PublicKey.decode(
-    "untrusted comment: minisign public key 60DF2F3B621B4533\n" +
+  "untrusted comment: minisign public key 60DF2F3B621B4533\n" +
     "RWQzRRtiOy/fYNCli5tW96CO6R+FnO92LceeIoWlCLj+BTVe+6q8T69M"
 );
 ```
@@ -75,7 +73,7 @@ Create a Minisign signature from a string:
 
 ```js
 const signature = minisignVerify.Signature.decode(
-    "untrusted comment: signature from minisign secret key\n" +
+  "untrusted comment: signature from minisign secret key\n" +
     "RWQzRRtiOy/fYEU/vGHUEfBg+lSmrdpViX3l9fX1Ps6FMBrBcsMw9uxsLPFr9pAMdKy1NVEX3MsHsuCKlSVNYc4C5/pCnU/Kugk=\n" +
     "trusted comment: timestamp:1634045550	file:test.txt\n" +
     "zEHzYWS0L/lFlN3hfMdAJA0MsVfazBXbwSw9XihxQ0msFQPlC30F6Ajvxi67KEFNd1GUhdi3DcslssTW8MUECQ=="
@@ -91,18 +89,16 @@ return `true`.
 ```js
 const signedData = new TextEncoder().encode("test\n");
 try {
-    publicKey.verify(signedData, signature);
-    console.info("Signature verification succeeded");
-} catch(e) {
-    console.error(e);
+  publicKey.verify(signedData, signature);
+  console.info("Signature verification succeeded");
+} catch (e) {
+  console.error(e);
 }
 ```
-
 
 ## Dev Setup
 
     cargo install wasm-pack
-
 
 ## Building
 
@@ -111,7 +107,6 @@ try {
 
     # Release build
     wasm-pack build --release -- --no-default-features
-
 
 ## Running the testproject
 
@@ -122,7 +117,6 @@ try {
     # Run server
     npm run start
 
-
 ## Testing
 
     # Unit tests
@@ -131,21 +125,18 @@ try {
     # NodeJS tests
     wasm-pack test --node
 
-
 ## License
 
 Licensed under either of
 
- * Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or
-   http://www.apache.org/licenses/LICENSE-2.0)
- * MIT license ([LICENSE-MIT](LICENSE-MIT) or
-   http://opensource.org/licenses/MIT)
+- Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or
+  http://www.apache.org/licenses/LICENSE-2.0)
+- MIT license ([LICENSE-MIT](LICENSE-MIT) or
+  http://opensource.org/licenses/MIT)
 
 at your option.
 
-
 <!-- Badges -->
-[github-actions]: https://github.com/threema-ch/wasm-minisign-verify/actions?query=branch%3Amain
-[github-actions-badge]: https://github.com/threema-ch/wasm-minisign-verify/workflows/CI/badge.svg
+
 [license]: https://github.com/threema-ch/wasm-minisign-verify#license
 [license-badge]: https://img.shields.io/badge/License-Apache%202.0%20%2f%20MIT-blue.svg
