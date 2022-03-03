@@ -70,6 +70,7 @@ Audit Rust dependencies:
     stage: Audit Rust
     before_script:
         - !reference [.setup rust, before_script]
+        - apk add --no-cache openssl-dev
     script:
         - cargo install cargo-audit
         - cargo audit
