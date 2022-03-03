@@ -1,0 +1,27 @@
+# EditorConfig is awesome: https://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# Unix-style newlines with a newline ending every file
+[*]
+insert_final_newline = true
+indent_style = space
+indent_size = 2
+charset = utf-8
+trim_trailing_whitespace = true
+
+# Deactivate for files in .git directory
+[.git/**]
+trim_trailing_whitespace = false
+
+# Don't trim for markdown, it has a purpose there
+[*.md]
+trim_trailing_whitespace = false
+
+[*.rs]
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+indent_style = space
+indent_size = 4
