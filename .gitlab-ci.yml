@@ -28,20 +28,51 @@ stages:  # stages are executed in the order they are defined; if no direct depen
     - Lint Rust
     - Lint
     - Audit Rust
+    - Generate Deno bindings
 
 .setup rust:
     before_script:
         - rustc --version
         - cargo --version
 
+.setup wasm-pack:
+    before_script:
+        - curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
+        - wasm-pack --version
+
 Build Rust Code:
     stage: Build Rust
     before_script:
         - !reference [.setup rust, before_script]
+        - !reference [.setup wasm-pack, before_script]
     script:
-        - cargo build --verbose
+        - wasm-pack build --release
+        - 'WASM_BINDGEN=`[[ -z "${XDG_CACHE_HOME}" ]] && find $HOME/.cache -name wasm-bindgen || find $HOME/.cache $XDG_CACHE_HOME -name wasm-bindgen`'
+        - '[[ -z "${WASM_BINDGEN}" ]] && echo wasm-bindgen not found && (exit 1)'
+        - 'cp $WASM_BINDGEN .'
     rules:
         - !reference [.default run rules, rules]
+    artifacts:
+        paths:
+            - "target/wasm32-unknown-unknown/release/wasm_minisign_verify.wasm"
+            - "wasm-bindgen"
+        expire_in: 2 hours
+
+Generate Deno bindings:
+    stage: Generate Deno bindings
+    before_script:
+        - !reference [.setup rust, before_script]
+        - !reference [.setup wasm-pack, before_script]
+    script:
+        - './wasm-bindgen --target deno --typescript --out-dir pkg target/wasm32-unknown-unknown/release/wasm_minisign_verify.wasm'
+    rules:
+        - !reference [.default run rules, rules]
+    dependencies:
+        - "Build Rust Code"
+    artifacts:
+        paths:
+            - "pkg"
+        expire_in: 2 hours
 
 Test Rust Code:
     stage: Test Rust
