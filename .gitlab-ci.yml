@@ -61,9 +61,8 @@ Build Rust Code:
 
 Generate Deno bindings:
     stage: Generate Deno bindings
-    before_script:
-        - !reference [.setup rust, before_script]
-        - !reference [.setup wasm-pack, before_script]
+    variables:
+        GIT_STRATEGY: none
     script:
         - './wasm-bindgen --target deno --typescript --out-dir pkg target/wasm32-unknown-unknown/release/wasm_minisign_verify.wasm'
     rules:
