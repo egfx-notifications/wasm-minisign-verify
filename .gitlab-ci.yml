@@ -41,6 +41,12 @@ stages:  # stages are executed in the order they are defined; if no direct depen
         - curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh
         - wasm-pack --version
 
+.setup nodejs:
+    before_script:
+        - apt update
+        - apt install -y nodejs
+        - node --version
+
 Build Rust Code:
     stage: Build Rust
     before_script:
@@ -78,8 +84,11 @@ Test Rust Code:
     stage: Test Rust
     before_script:
         - !reference [.setup rust, before_script]
+        - !reference [.setup wasm-pack, before_script]
+        - !reference [.setup nodejs, before_script]
     script:
         - cargo test --verbose
+        - wasm-pack test --node
     needs: ["Build Rust Code"]
     rules:
         - !reference [.default run rules, rules]
