@@ -1,6 +1,7 @@
 ---
 variables:  # global variables applying to all jobs unless explicitly overwritten
     REQUESTS_CA_BUNDLE: /etc/ssl/certs/ca-certificates.crt  # this tells python to actually use the installed system certificates
+    DENO_STD_VERSION: 0.132.0  # Deno std version to use in Deno binding code
 
 .default run rules:
     rules:  # determine if job should run or not; evaluation stops at the first matching rule!
@@ -96,7 +97,7 @@ Bundle WASM for Deno:  # this job fixes some problems in the glue code currently
         - sed -i -f command.sed "pkg/wasm_minisign_verify.js"  # if WASM is supposed to be loaded via http: or https: load inline base64 instead
         - rm pkg/wasm_minisign_verify.base64  # remove base64 encoded payload again so we do not package it
         - rm command.sed  # remove sed command again so we do not package it
-        - echo -e "import * as base64 from \"https://deno.land/std/encoding/base64.ts\";\n`cat pkg/wasm_minisign_verify.js`" > pkg/wasm_minisign_verify.js  # prepend import of base64 from Deno std to the file
+        - echo -e "import * as base64 from \"https://deno.land/std@$DENO_STD_VERSION/encoding/base64.ts\";\n`cat pkg/wasm_minisign_verify.js`" > pkg/wasm_minisign_verify.js  # prepend import of base64 from Deno std to the file
     rules:
         - !reference [.default run rules, rules]
     needs:
