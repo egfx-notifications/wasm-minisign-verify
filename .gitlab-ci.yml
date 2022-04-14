@@ -1,7 +1,7 @@
 ---
 variables:  # global variables applying to all jobs unless explicitly overwritten
     REQUESTS_CA_BUNDLE: /etc/ssl/certs/ca-certificates.crt  # this tells python to actually use the installed system certificates
-    DENO_STD_VERSION: 0.132.0  # Deno std version to use in Deno binding code
+    DENO_STD_VERSION: 0.134.0  # Deno std version to use in Deno binding code
 
 .default run rules:
     rules:  # determine if job should run or not; evaluation stops at the first matching rule!
